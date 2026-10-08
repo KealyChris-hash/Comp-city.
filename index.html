@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMP CITY</title>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#0a0e1a;color:#fff}
+header{display:flex;justify-content:space-between;padding:15px;background:#111827;position:sticky;top:0;z-index:10}
+.logo{color:#22c55e;font-weight:bold;font-size:22px;cursor:pointer}.btn{background:#22c55e;color:#000;border:none;padding:10px 16px;border-radius:20px;font-weight:bold;cursor:pointer}
+.container{max-width:1000px;margin:auto;padding:15px}.card{background:#1f2937;padding:20px;border-radius:14px;margin:12px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.premium{border:2px solid #facc15;position:relative}.premium::after{content:"PREMIUM 🔒";position:absolute;top:-10px;right:10px;background:#facc15;color:#000;padding:4px 8px;border-radius:10px;font-size:11px;font-weight:bold}
+.lock{filter:blur(5px);pointer-events:none}.input{width:100%;padding:12px;border-radius:8px;border:none;margin:6px 0;background:#374151;color:white}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;justify-content:center;align-items:center;z-index:30}.modal.active{display:flex}
+.box{background:#1f2937;padding:22px;border-radius:14px;width:92%;max-width:580px;max-height:90vh;overflow:auto}
+.pay{padding:12px;background:#374151;border-radius:8px;margin:6px 0;cursor:pointer}.hidden{display:none}
+.video-box{background:#111827;border-radius:12px;padding:12px;margin:12px 0;border:1px solid #374151}
+</style>
+</head>
+<body>
+<header><div class="logo" onclick="adminClick()">COMP CITY 🖥️</div><div><span id="userShow" style="font-size:13px;color:#9ca3af"></span> <button class="btn" onclick="openAuth()" id="authBtn">Sign In</button></div></header>
+<div class="container">
+<div class="card" style="text-align:center"><h3>Verify Human</h3><div style="display:flex;justify-content:center;margin:10px"><div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-callback="ok"></div></div><p id="vmsg" style="color:#9ca3af">Complete robot check</p></div>
+<div id="main" class="hidden">
+<h3>Free</h3><div class="grid"><div class="card">📝 Word <button class="btn" style="width:100%;margin-top:8px" onclick="openLesson('word')">Start</button></div><div class="card">📊 PowerPoint <button class="btn" style="width:100%;margin-top:8px" onclick="openLesson('ppt')">Start</button></div><div class="card">📈 Excel <button class="btn" style="width:100%;margin-top:8px" onclick="openLesson('excel')">Start</button></div></div>
+<h3 style="margin-top:20px">Premium - 5 Courses ₦5k each / ₦20k all 5</h3>
+<div class="card" style="border:2px solid #22c55e;text-align:center;background:#111827"><button class="btn" style="width:100%" onclick="openPay('all','all')">Unlock All 5 - ₦20,000</button></div>
+<div class="grid">
+<div class="card premium"><div class="lock" id="l1"><h4>🌐 Website</h4></div><button class="btn" id="btn1" style="background:#facc15;width:100%" onclick="openPay('one','website')">Unlock ₦5k</button></div>
+<div class="card premium"><div class="lock" id="l2"><h4>📱 Apps</h4></div><button class="btn" id="btn2" style="background:#facc15;width:100%" onclick="openPay('one','apps')">Unlock ₦5k</button></div>
+<div class="card premium"><div class="lock" id="l3"><h4>🧩 Scratch</h4></div><button class="btn" id="btn3" style="background:#facc15;width:100%" onclick="openPay('one','scratch')">Unlock ₦5k</button></div>
+<div class="card premium"><div class="lock" id="l4"><h4>💻 Coding</h4></div><button class="btn" id="btn4" style="background:#facc15;width:100%" onclick="openPay('one','coding')">Unlock ₦5k</button></div>
+<div class="card premium"><div class="lock" id="l5"><h4>🎥 Watch Videos - Intro + Practical</h4></div><button class="btn" id="btn5" style="background:#facc15;width:100%" onclick="openPay('one','videos')">Unlock ₦5k</button></div>
+</div>
+</div>
+<div id="lessonBox" class="card hidden"></div>
+</div>
+<div class="modal" id="auth"><div class="box"><h2 id="aTitle">Create Account</h2><input class="input" id="aEmail" placeholder="Email"><input class="input" type="password" id="aPass" placeholder="Password"><button class="btn" style="width:100%" onclick="signUp()">Create</button><p style="text-align:center;margin-top:10px"><span onclick="toggleA()" id="toggleTxt" style="color:#22c55e;cursor:pointer">Already have? Sign In</span> | <span onclick="closeA()" style="color:gray;cursor:pointer">Close</span></p></div></div>
+<div class="modal" id="pay"><div class="box"><h2 id="payTitle">Unlock</h2><p id="payDetail"></p><p id="payAmount" style="color:#facc15;font-weight:bold"></p><div class="pay" onclick="showPay('bank')">🏦 Bank Transfer - Hidden</div><div class="pay" onclick="showPay('visa')">💳 Card</div><div id="bankBox" class="hidden"><div style="text-align:center"><b id="bankAmt" style="color:#22c55e;font-size:22px">₦5,000</b></div><input class="input" id="bankRef" placeholder="Ref"><button class="btn" style="width:100%;background:#facc15" onclick="confirmPay()">I Have Paid</button></div><div id="visaBox" class="hidden"><button class="btn" style="width:100%;background:#facc15" onclick="confirmPay()">Pay demo</button></div><button class="btn" style="width:100%;background:transparent;border:1px solid gray;color:gray;margin-top:8px" onclick="closeP()">Cancel</button></div></div>
+<div class="modal" id="admin"><div class="box"><h2>Admin 🔒</h2><div id="adminLogin"><input class="input" type="password" id="adminPass" placeholder="Password"><button class="btn" style="width:100%" onclick="unlockAdmin()">Unlock</button><p id="adminMsg" style="color:red"></p></div><div id="adminContent" class="hidden"><div style="background:#111827;padding:12px;border-radius:8px"><p>Bank: <b id="aBank">OPay</b></p><p>Account: <b id="aAcc" style="color:#22c55e;font-size:20px">7041234567</b></p><p>Name: <b id="aName">Jiga Ventures</b></p></div><div id="adminList"></div><button class="btn" style="width:100%;background:gray;margin-top:10px" onclick="closeAdmin()">Close</button></div></div></div>
+
+<script>
+const ADMIN_PASSWORD="compcity123"; const HIDDEN_BANK="OPay"; const HIDDEN_ACCOUNT="7041234567"; const HIDDEN_NAME="Jiga Ventures";
+let users=JSON.parse(localStorage.getItem('comp_users')||'[]'); let current=localStorage.getItem('comp_current'); let premiumList=JSON.parse(localStorage.getItem('comp_premium_list')||'[]');
+let selType='',selCourse='',selAmount=5000; let logoClicks=0;
+if(current){document.getElementById('userShow').innerText=current; document.getElementById('authBtn').innerText='Logout'; unlockCheck()}
+function ok(){document.getElementById('vmsg').innerText='✅ Verified';document.getElementById('main').classList.remove('hidden')}
+function openAuth(){if(current){localStorage.removeItem('comp_current');location.reload();return;} document.getElementById('auth').classList.add('active')}
+function closeA(){document.getElementById('auth').classList.remove('active')}
+function toggleA(){let t=document.getElementById('aTitle'); if(t.innerText.includes('Create')){t.innerText='Sign In'; document.getElementById('toggleTxt').innerText='No account? Sign Up'} else{t.innerText='Create Account'; document.getElementById('toggleTxt').innerText='Already have account? Sign In'}}
+function signUp(){let e=document.getElementById('aEmail').value.trim(); let pw=document.getElementById('aPass').value; if(!e||!pw){alert('Fill');return} let mode=document.getElementById('aTitle').innerText; if(mode.includes('Create')){if(users.find(u=>u.email==e)){alert('Exists');return} users.push({email:e,pass:pw}); localStorage.setItem('comp_users',JSON.stringify(users));}else{let u=users.find(u=>u.email==e && u.pass==pw); if(!u){alert('Wrong');return}} localStorage.setItem('comp_current',e); closeA(); location.reload();}
+function openPay(type,course){if(!current){openAuth();return} selType=type; selCourse=course; selAmount=type==='all'?20000:5000; document.getElementById('payTitle').innerText=type==='all'?'All 5 Courses':'1 Course'; document.getElementById('payDetail').innerText=type==='all'?'Website + Apps + Scratch + Coding + Videos':'Course: '+course; document.getElementById('payAmount').innerText='₦'+selAmount.toLocaleString(); document.getElementById('bankAmt').innerText='₦'+selAmount.toLocaleString(); document.getElementById('pay').classList.add('active');}
+function closeP(){document.getElementById('pay').classList.remove('active')}
+function showPay(t){document.getElementById('bankBox').classList.add('hidden'); document.getElementById('visaBox').classList.add('hidden'); if(t=='bank') document.getElementById('bankBox').classList.remove('hidden'); if(t=='visa') document.getElementById('visaBox').classList.remove('hidden');}
+function confirmPay(){let ref=document.getElementById('bankRef').value.trim()||'card-'+Date.now(); let pending=JSON.parse(localStorage.getItem('pending_pay')||'[]'); pending.push({email:current,type:selType,course:selCourse,amount:selAmount,ref:ref}); localStorage.setItem('pending_pay',JSON.stringify(pending)); if(selType==='all'){localStorage.setItem('comp_premium','yes'); localStorage.setItem('comp_premium_list',JSON.stringify(['website','apps','scratch','coding','videos']));} else{if(!premiumList.includes(selCourse)) premiumList.push(selCourse); localStorage.setItem('comp_premium_list',JSON.stringify(premiumList)); if(premiumList.length>=5) localStorage.setItem('comp_premium','yes');} closeP(); unlockCheck();}
+function unlockCheck(){let list=JSON.parse(localStorage.getItem('comp_premium_list')||'[]'); let all=localStorage.getItem('comp_premium')=='yes' || list.length>=5; if(all){['l1','l2','l3','l4','l5'].forEach(id=>{let e=document.getElementById(id); if(e){e.classList.remove('lock'); e.style.filter='none'}}); ['btn1','btn2','btn3','btn4','btn5'].forEach(id=>{let b=document.getElementById(id); if(b){b.innerText='Start'; b.style.background='#22c55e'; b.onclick=()=>openLesson(b.id=='btn5'?'videos':'premium')}});} else{let map={website:'l1',apps:'l2',scratch:'l3',coding:'l4',videos:'l5'}; let bmap={website:'btn1',apps:'btn2',scratch:'btn3',coding:'btn4',videos:'btn5'}; list.forEach(c=>{let el=document.getElementById(map[c]); if(el){el.classList.remove('lock'); el.style.filter='none'} let b=document.getElementById(bmap[c]); if(b){b.innerText='Start'; b.style.background='#22c55e'; b.onclick=()=>openLesson(c)}});}}
+function adminClick(){logoClicks++; if(logoClicks>=5){logoClicks=0; document.getElementById('admin').classList.add('active');} setTimeout(()=>logoClicks=0,2000);}
+function closeAdmin(){document.getElementById('admin').classList.remove('active'); document.getElementById('adminLogin').classList.remove('hidden'); document.getElementById('adminContent').classList.add('hidden');}
+function unlockAdmin(){let p=document.getElementById('adminPass').value; if(p!==ADMIN_PASSWORD){document.getElementById('adminMsg').innerText='Wrong'; return;} document.getElementById('adminLogin').classList.add('hidden'); document.getElementById('adminContent').classList.remove('hidden'); document.getElementById('aBank').innerText=HIDDEN_BANK; document.getElementById('aAcc').innerText=HIDDEN_ACCOUNT; document.getElementById('aName').innerText=HIDDEN_NAME;}
+
+function openLesson(type){
+  let box=document.getElementById('lessonBox'); box.classList.remove('hidden');
+  if(type=='videos'){
+    box.innerHTML=`
+    <h2>🎥 Watch Videos - Intro + Practical for All Features</h2>
+    <p style="color:#9ca3af">Real YouTube intro and practical doing</p>
+
+    <!-- INTRO COMP CITY -->
+    <div class="video-box">
+      <b>🔵 COMP CITY Intro - What you will learn</b><br><small style="color:#9ca3af">Intro</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/IlU-zLaQpJk" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <!-- WORD -->
+    <div class="video-box">
+      <b>📝 Microsoft Word - INTRO</b> <small style="color:gray">What is Word? Why use it?</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/S-nHYzK-BVg" frameborder="0" allowfullscreen></iframe>
+      <div style="margin-top:10px"><b>📝 Microsoft Word - PRACTICAL</b> <small style="color:#22c55e">Type CV step by step</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/y7siZ5OLo-Y" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+
+    <!-- POWERPOINT -->
+    <div class="video-box">
+      <b>📊 PowerPoint - INTRO</b> <small style="color:gray">What is PowerPoint?</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/5iRK1QKJbmo" frameborder="0" allowfullscreen></iframe>
+      <div style="margin-top:10px"><b>📊 PowerPoint - PRACTICAL</b> <small style="color:#22c55e">Make slides</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/XF34-Wu6cJA" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+
+    <!-- EXCEL -->
+    <div class="video-box">
+      <b>📈 Excel - INTRO</b> <small style="color:gray">What is Excel?</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/Vl0H-qTclEQ" frameborder="0" allowfullscreen></iframe>
+      <div style="margin-top:10px"><b>📈 Excel - PRACTICAL</b> <small style="color:#22c55e">Sales record, formulas</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/rwbho0CgEAE" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+
+    <!-- WEBSITE -->
+    <div class="video-box">
+      <b>🌐 Website - INTRO</b> <small style="color:gray">What is HTML CSS JS?</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/N8YMl4ez3l8" frameborder="0" allowfullscreen></iframe>
+      <div style="margin-top:10px"><b>🌐 Website - PRACTICAL</b> <small style="color:#facc15">Build site like Comp City</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/qz0aGYrrlhU" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+
+    <!-- APPS -->
+    <div class="video-box">
+      <b>📱 Apps - INTRO</b> <small style="color:gray">What is Android Studio?</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/k5wJv4XO9CY" frameborder="0" allowfullscreen></iframe>
+      <div style="margin-top:10px"><b>📱 Apps - PRACTICAL</b> <small style="color:#facc15">Create first Android app</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/fis26HvvDII" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+
+    <!-- SCRATCH -->
+    <div class="video-box">
+      <b>🧩 Scratch - INTRO</b> <small style="color:gray">What is Scratch?</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/9Dr-d9x9h3o" frameborder="0" allowfullscreen></iframe>
+      <div style="margin-top:10px"><b>🧩 Scratch - PRACTICAL</b> <small style="color:#facc15">Build game</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/jxWdE7m3z2Q" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+
+    <!-- CODING -->
+    <div class="video-box">
+      <b>💻 Coding/Python - INTRO</b> <small style="color:gray">What is coding?</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/kqtD5dpn9C8" frameborder="0" allowfullscreen></iframe>
+      <div style="margin-top:10px"><b>💻 Coding - PRACTICAL</b> <small style="color:#facc15">Write first code</small>
+      <iframe width="100%" height="240" style="border-radius:10px;margin-top:8px" src="https://www.youtube.com/embed/_uQrJ0TkZlc" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+
+    <button class="btn" style="margin-top:12px" onclick="this.parentElement.classList.add('hidden')">Close</button>
+    `;
+  } else {
+    box.innerHTML='<h3>'+type+'</h3><button class="btn" onclick="this.parentElement.classList.add(`hidden`)">Close</button>';
+  }
+  box.scrollIntoView();
+}
+</script>
+</body>
+</html>
